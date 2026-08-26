@@ -1,0 +1,7 @@
+Django
+djangorestframework
+psycopg[binary]
+redis
+celery
+gunicorn
+drf-spectacular
