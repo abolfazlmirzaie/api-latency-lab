@@ -25,6 +25,14 @@ We do not assume that an optimization is better. We measure its actual impact un
 
 ---
 
+# Current Status
+
+* The Django API (`api/django/`) is implemented and fully dockerized (`docker-compose.yaml`), running behind Postgres.
+* Redis and Celery containers are already provisioned in `docker-compose.yaml`, but **they are not yet wired into the application**. No endpoint currently uses Redis for caching, and no task currently runs through Celery. They exist as infrastructure only, waiting for the Caching and Async benchmarks (see milestones) to activate and measure them.
+* FastAPI (`api/fastapi/`) has not been implemented yet; it is planned for the Framework benchmark.
+
+---
+
 # Project Structure
 
 ```text
