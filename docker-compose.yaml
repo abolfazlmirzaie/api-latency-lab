@@ -15,7 +15,7 @@ services:
         condition: service_healthy
     command:
       - gunicorn
-      - config.wsgi:application
+      - core.wsgi:application
       - --bind
       - 0.0.0.0:8000
 
@@ -60,7 +60,7 @@ services:
     command:
       - celery
       - -A
-      - config
+      - core
       - worker
       - --loglevel=INFO
 
