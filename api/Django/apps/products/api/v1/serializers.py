@@ -1,7 +1,6 @@
-from apps.products.models import Products, Category
+from apps.products.models import Product, Category
 from rest_framework import serializers
 
-from apps.products.models import Category
 
 
 class CategorySerializer(serializers.ModelSerializer):
@@ -12,7 +11,7 @@ class CategorySerializer(serializers.ModelSerializer):
 class ProductSerializer(serializers.ModelSerializer):
 
     class Meta:
-        model = Products
+        model = Product
         fields = '__all__'
 
 
@@ -20,7 +19,7 @@ class ProductSerializer(serializers.ModelSerializer):
 class ProductWithCategorySerializer(serializers.ModelSerializer):
     category = CategorySerializer(many=True)
     class Meta:
-        model = Products
+        model = Product
 
         fields = [
             'id',
