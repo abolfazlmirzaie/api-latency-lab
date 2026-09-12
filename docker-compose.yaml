@@ -13,40 +13,13 @@ services:
     depends_on:
       postgres:
         condition: service_healthy
-
+      redis:
+        condition: service_healthy
     command:
       - gunicorn
       - core.wsgi:application
       - --bind
       - 0.0.0.0:8000
-      - --workers
-      - "4"
-
-  # ASGI service — used ONLY for the "async" scenario (BENCH-010).
-  # Must be a separate process from the WSGI service above: a single
-  # Gunicorn command cannot serve both core.wsgi and core.asgi at once,
-  # and running the async view under WSGI (as before) defeats the whole
-  # point of the benchmark.
-  django-asgi:
-    build:
-      context: .
-      dockerfile: Dockerfile
-    container_name: api_latency_django_asgi
-    restart: unless-stopped
-    env_file:
-      - .env
-    ports:
-      - "8001:8001"
-    depends_on:
-      postgres:
-        condition: service_healthy
-    command:
-      - gunicorn
-      - core.asgi:application
-      - -k
-      - uvicorn.workers.UvicornWorker
-      - --bind
-      - 0.0.0.0:8001
       - --workers
       - "4"
 
@@ -74,6 +47,11 @@ services:
     restart: unless-stopped
     volumes:
       - redis_data:/data
+    healthcheck:
+      test: ["CMD", "redis-cli", "ping"]
+      interval: 5s
+      timeout: 3s
+      retries: 5
 
   celery:
     build:
@@ -87,7 +65,7 @@ services:
       postgres:
         condition: service_healthy
       redis:
-        condition: service_started
+        condition: service_healthy
     command:
       - celery
       - -A
@@ -95,34 +73,8 @@ services:
       - worker
       - --loglevel=INFO
 
-  locust-master:
-    image: locustio/locust
-    container_name: locust-master
-    ports:
-      - "8089:8089"
-    volumes:
-      - ./load_tests:/mnt/locust
 
-    command:
-      - -f
-      - /mnt/locust
-      - --master
-    depends_on:
-      - django
-      - django-asgi
 
-  locust-worker:
-    image: locustio/locust
-    container_name: locust-worker
-    volumes:
-      - ./load_tests:/mnt/locust
-    command:
-      - -f
-      - /mnt/locust
-      - --worker
-      - --master-host=locust-master
-    depends_on:
-      - locust-master
 
 volumes:
   postgres_data:

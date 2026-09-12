@@ -10,10 +10,3 @@ app.config_from_object("django.conf:settings", namespace="CELERY")
 
 
 app.autodiscover_tasks()
-app.autodiscover_tasks(
-    [
-        "apps.experiments.async_bench",
-        # "apps.experiments.caching_bench",   
-        # "apps.experiments.database_bench",  
-    ]
-)
