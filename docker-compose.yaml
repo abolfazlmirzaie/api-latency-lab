@@ -13,11 +13,15 @@ services:
     depends_on:
       postgres:
         condition: service_healthy
+      redis:
+        condition: service_healthy
     command:
       - gunicorn
       - core.wsgi:application
       - --bind
       - 0.0.0.0:8000
+      - --workers
+      - "4"
 
   postgres:
     image: postgres:17-alpine
@@ -43,6 +47,11 @@ services:
     restart: unless-stopped
     volumes:
       - redis_data:/data
+    healthcheck:
+      test: ["CMD", "redis-cli", "ping"]
+      interval: 5s
+      timeout: 3s
+      retries: 5
 
   celery:
     build:
@@ -56,13 +65,16 @@ services:
       postgres:
         condition: service_healthy
       redis:
-        condition: service_started
+        condition: service_healthy
     command:
       - celery
       - -A
       - core
       - worker
       - --loglevel=INFO
+
+
+
 
 volumes:
   postgres_data:

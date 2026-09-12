@@ -23,6 +23,7 @@ SpectacularSwaggerView
 
 urlpatterns = [
     path("admin/", admin.site.urls),
+
     path('', include('apps.products.api.v1.urls')),
     path("api/schema/", SpectacularAPIView.as_view(), name="schema"),
     path(
